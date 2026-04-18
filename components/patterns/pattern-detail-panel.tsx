@@ -14,12 +14,20 @@ type Props = {
   onSectionChange: (section: DetailSection) => void;
 };
 
-export function PatternDetailPanel({ pattern, section, onSectionChange }: Props) {
+export function PatternDetailPanel({
+  pattern,
+  section,
+  onSectionChange,
+}: Props) {
   return (
-    <article className="overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] shadow-sm">
+    <article className="w-full min-w-0 max-w-full overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] shadow-sm">
       <header className="border-b border-[var(--border-subtle)] bg-[var(--surface-muted)] px-5 py-5 sm:px-7">
-        <h2 className="text-lg font-semibold tracking-tight text-[var(--text-primary)]">{pattern.name}</h2>
-        <p className="mt-1 text-sm text-[var(--text-secondary)]">{pattern.tagline}</p>
+        <h2 className="text-lg font-semibold tracking-tight text-[var(--text-primary)]">
+          {pattern.name}
+        </h2>
+        <p className="mt-1 text-sm text-[var(--text-secondary)]">
+          {pattern.tagline}
+        </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <MetaPill>{pattern.badge}</MetaPill>
           <MetaPill>{pattern.catalogLabel ?? "GoF Pattern"}</MetaPill>
@@ -49,7 +57,7 @@ export function PatternDetailPanel({ pattern, section, onSectionChange }: Props)
         })}
       </div>
 
-      <div className="px-5 py-6 sm:px-7">
+      <div className="min-w-0 px-5 py-6 sm:px-7">
         {section === "overview" && <OverviewBody pattern={pattern} />}
         {section === "code" && <CodeBody pattern={pattern} />}
         {section === "impl" && <ImplBody pattern={pattern} />}
@@ -77,18 +85,30 @@ function OverviewBody({ pattern }: { pattern: PatternRecord }) {
         <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--analogy-label)]">
           Real-world analogy
         </p>
-        <p className="mt-2 text-sm leading-relaxed text-[var(--text-primary)]">{pattern.analogy}</p>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--text-primary)]">
+          {pattern.analogy}
+        </p>
       </div>
       <InfoCard title="Solution">{pattern.solution}</InfoCard>
     </>
   );
 }
 
-function InfoCard({ title, children }: { title: string; children: React.ReactNode }) {
+function InfoCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-muted)] px-5 py-4">
-      <h4 className="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">{title}</h4>
-      <p className="mt-2 text-sm leading-relaxed text-[var(--text-primary)]">{children}</p>
+      <h4 className="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+        {title}
+      </h4>
+      <p className="mt-2 text-sm leading-relaxed text-[var(--text-primary)]">
+        {children}
+      </p>
     </div>
   );
 }
@@ -100,7 +120,7 @@ function CodeBody({ pattern }: { pattern: PatternRecord }) {
         {pattern.codeSectionLabel ?? "Spring Boot implementation"}
       </p>
       <pre
-        className="pattern-code scrollbar-thin overflow-x-auto rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-muted)] p-5 font-mono text-[12px] leading-relaxed text-[var(--text-primary)]"
+        className="pattern-code scrollbar-thin min-w-0 max-w-full overflow-x-auto rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-muted)] p-5 font-mono text-[12px] leading-relaxed text-[var(--text-primary)]"
         dangerouslySetInnerHTML={{ __html: pattern.code }}
       />
     </>

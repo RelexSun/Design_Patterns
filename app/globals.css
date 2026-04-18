@@ -16,7 +16,12 @@
   --analogy-border: #f59e0b;
   --analogy-label: #b45309;
   --analogy-bg: rgba(245, 158, 11, 0.08);
-  --header-gradient: linear-gradient(135deg, #f8fafc 0%, #eff6ff 45%, #faf5ff 100%);
+  --header-gradient: linear-gradient(
+    135deg,
+    #f8fafc 0%,
+    #eff6ff 45%,
+    #faf5ff 100%
+  );
   --badge-create-bg: #e6f1fb;
   --badge-create-fg: #0c447c;
   --badge-create-border: rgba(12, 68, 124, 0.15);
@@ -50,7 +55,12 @@
   --analogy-border: #fbbf24;
   --analogy-label: #fcd34d;
   --analogy-bg: rgba(251, 191, 36, 0.08);
-  --header-gradient: linear-gradient(135deg, #09090b 0%, #0f172a 40%, #1e1b4b 100%);
+  --header-gradient: linear-gradient(
+    135deg,
+    #09090b 0%,
+    #0f172a 40%,
+    #1e1b4b 100%
+  );
   --badge-create-bg: #042c53;
   --badge-create-fg: #85b7eb;
   --badge-create-border: rgba(133, 183, 235, 0.2);

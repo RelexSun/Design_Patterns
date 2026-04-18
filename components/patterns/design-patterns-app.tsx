@@ -10,7 +10,12 @@ import { SummaryView } from "./summary-view";
 import { FintechView } from "./fintech-view";
 
 function isPatternCategory(v: MainView): v is PatternCategory {
-  return v === "creational" || v === "structural" || v === "behavioral" || v === "solid";
+  return (
+    v === "creational" ||
+    v === "structural" ||
+    v === "behavioral" ||
+    v === "solid"
+  );
 }
 
 const initialIndices: Record<PatternCategory, number> = {
@@ -33,14 +38,20 @@ export function DesignPatternsApp() {
   const [indices, setIndices] = useState(initialIndices);
   const [sections, setSections] = useState(initialSections);
 
-  const selectPattern = useCallback((category: PatternCategory, index: number) => {
-    setIndices((prev) => ({ ...prev, [category]: index }));
-    setSections((prev) => ({ ...prev, [category]: "overview" }));
-  }, []);
+  const selectPattern = useCallback(
+    (category: PatternCategory, index: number) => {
+      setIndices((prev) => ({ ...prev, [category]: index }));
+      setSections((prev) => ({ ...prev, [category]: "overview" }));
+    },
+    [],
+  );
 
-  const setDetailSection = useCallback((category: PatternCategory, section: DetailSection) => {
-    setSections((prev) => ({ ...prev, [category]: section }));
-  }, []);
+  const setDetailSection = useCallback(
+    (category: PatternCategory, section: DetailSection) => {
+      setSections((prev) => ({ ...prev, [category]: section }));
+    },
+    [],
+  );
 
   const patternDetail = useMemo(() => {
     if (!isPatternCategory(mainView)) return null;
@@ -52,10 +63,10 @@ export function DesignPatternsApp() {
   return (
     <>
       <MainCategoryTabs active={mainView} onChange={setMainView} />
-      <div className="mx-auto max-w-6xl flex-1 px-4 py-8 sm:px-8">
+      <div className="flex-1 px-4 py-8 sm:px-8 lg:px-20">
         {isPatternCategory(mainView) && patternDetail ? (
-          <div className="animate-fade-in space-y-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start lg:gap-8 xl:gap-10">
-            <div className="min-w-0 lg:sticky lg:top-[4.25rem] lg:self-start">
+          <div className="animate-fade-in space-y-6 flex-col lg:gap-8 lg:space-y-0 xl:gap-10">
+            <div className="min-w-0 lg:sticky lg:top-[4rem] lg:self-center bg-background z-10 py-0.5">
               <PatternCardGrid
                 patterns={PATTERNS[mainView]}
                 selectedIndex={indices[mainView]}
