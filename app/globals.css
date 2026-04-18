@@ -1,26 +1,172 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --surface: #fafafa;
+  --surface-elevated: #ffffff;
+  --surface-muted: #f4f4f5;
+  --border-subtle: rgba(24, 24, 27, 0.08);
+  --border-strong: rgba(24, 24, 27, 0.14);
+  --text-primary: #18181b;
+  --text-secondary: #71717a;
+  --accent: #2563eb;
+  --accent-soft: rgba(37, 99, 235, 0.12);
+  --ring: rgba(37, 99, 235, 0.35);
+  --analogy-border: #f59e0b;
+  --analogy-label: #b45309;
+  --analogy-bg: rgba(245, 158, 11, 0.08);
+  --header-gradient: linear-gradient(135deg, #f8fafc 0%, #eff6ff 45%, #faf5ff 100%);
+  --badge-create-bg: #e6f1fb;
+  --badge-create-fg: #0c447c;
+  --badge-create-border: rgba(12, 68, 124, 0.15);
+  --badge-struct-bg: #eaf3de;
+  --badge-struct-fg: #27500a;
+  --badge-struct-border: rgba(39, 80, 10, 0.15);
+  --badge-behave-bg: #faeeda;
+  --badge-behave-fg: #633806;
+  --badge-behave-border: rgba(99, 56, 6, 0.15);
+  --badge-solid-bg: #ede9fe;
+  --badge-solid-fg: #4c1d95;
+  --badge-solid-border: rgba(76, 29, 149, 0.18);
+  --code-kw: #534ab7;
+  --code-an: #0f6e56;
+  --code-str: #854f0b;
+  --code-ty: #185fa5;
+  --code-ret: #993c1d;
+}
+
+.dark {
+  --surface: #09090b;
+  --surface-elevated: #0c0c0e;
+  --surface-muted: #18181b;
+  --border-subtle: rgba(244, 244, 245, 0.08);
+  --border-strong: rgba(244, 244, 245, 0.16);
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --accent: #60a5fa;
+  --accent-soft: rgba(96, 165, 250, 0.15);
+  --ring: rgba(96, 165, 250, 0.4);
+  --analogy-border: #fbbf24;
+  --analogy-label: #fcd34d;
+  --analogy-bg: rgba(251, 191, 36, 0.08);
+  --header-gradient: linear-gradient(135deg, #09090b 0%, #0f172a 40%, #1e1b4b 100%);
+  --badge-create-bg: #042c53;
+  --badge-create-fg: #85b7eb;
+  --badge-create-border: rgba(133, 183, 235, 0.2);
+  --badge-struct-bg: #173404;
+  --badge-struct-fg: #c0dd97;
+  --badge-struct-border: rgba(192, 221, 151, 0.2);
+  --badge-behave-bg: #412402;
+  --badge-behave-fg: #fac775;
+  --badge-behave-border: rgba(250, 199, 117, 0.2);
+  --badge-solid-bg: #2e1065;
+  --badge-solid-fg: #ddd6fe;
+  --badge-solid-border: rgba(221, 214, 254, 0.22);
+  --code-kw: #afa9ec;
+  --code-an: #5dcaa5;
+  --code-str: #fac775;
+  --code-ty: #85b7eb;
+  --code-ret: #f0997b;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--surface);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+/* Syntax highlighting spans (same class names as the original HTML). */
+.pattern-code .kw {
+  color: var(--code-kw);
+}
+.pattern-code .an {
+  color: var(--code-an);
+}
+.pattern-code .str {
+  color: var(--code-str);
+}
+.pattern-code .cm {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+.pattern-code .ty {
+  color: var(--code-ty);
+}
+.pattern-code .ret {
+  color: var(--code-ret);
+}
+
+/* Numbered implementation steps */
+.impl-steps {
+  counter-reset: step;
+}
+.impl-step {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.5rem;
+  background: var(--surface-muted);
+}
+.impl-step::before {
+  counter-increment: step;
+  content: counter(step);
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.impl-step-content {
+  flex: 1;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-fade-in {
+  animation: fade-in-up 0.25s ease-out both;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: var(--border-strong);
 }
