@@ -11,14 +11,22 @@ export function ThemeToggle() {
     queueMicrotask(() => setMounted(true));
   }, []);
 
-  const isDark = resolvedTheme === "dark";
+  const isDark = mounted && resolvedTheme === "dark";
+  const buttonLabel = !mounted
+    ? "Toggle theme"
+    : isDark
+      ? "Switch to light theme"
+      : "Switch to dark theme";
 
   return (
     <button
       type="button"
-      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      aria-label={buttonLabel}
       className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] shadow-sm transition hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={() => {
+        if (!mounted) return;
+        setTheme(isDark ? "light" : "dark");
+      }}
       disabled={!mounted}
     >
       {!mounted ? (

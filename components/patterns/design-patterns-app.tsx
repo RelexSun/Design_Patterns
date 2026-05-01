@@ -8,6 +8,7 @@ import { PatternCardGrid } from "./pattern-card-grid";
 import { PatternDetailPanel } from "./pattern-detail-panel";
 import { SummaryView } from "./summary-view";
 import { FintechView } from "./fintech-view";
+import { ScrollToTopButton } from "./scroll-to-top-button";
 
 function isPatternCategory(v: MainView): v is PatternCategory {
   return (
@@ -62,31 +63,36 @@ export function DesignPatternsApp() {
 
   return (
     <>
-      <MainCategoryTabs active={mainView} onChange={setMainView} />
-      <div className="flex-1 px-4 py-8 sm:px-8 lg:px-20">
-        {isPatternCategory(mainView) && patternDetail ? (
-          <div className="animate-fade-in space-y-6 flex-col lg:gap-8 lg:space-y-0 xl:gap-10">
-            <div className="min-w-0 lg:sticky lg:top-[4rem] lg:self-center bg-background z-10 py-0.5">
-              <PatternCardGrid
-                patterns={PATTERNS[mainView]}
-                selectedIndex={indices[mainView]}
-                onSelect={(i) => selectPattern(mainView, i)}
-              />
+      <div className="mx-auto grid w-full max-w-7xl flex-1 gap-6 px-4 py-6 sm:px-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
+        <aside className="order-first min-w-0 lg:order-none lg:sticky lg:top-[10.25rem] lg:self-start">
+          <MainCategoryTabs active={mainView} onChange={setMainView} />
+        </aside>
+        <div className="min-w-0">
+          {isPatternCategory(mainView) && patternDetail ? (
+            <div className="animate-fade-in grid w-full gap-5 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+              <div className="min-w-0 order-2 lg:order-1">
+                <PatternDetailPanel
+                  pattern={patternDetail}
+                  section={sections[mainView]}
+                  onSectionChange={(sec) => setDetailSection(mainView, sec)}
+                />
+              </div>
+              <aside className="min-w-0 order-1 lg:order-2 lg:sticky lg:top-[10.25rem]">
+                <PatternCardGrid
+                  patterns={PATTERNS[mainView]}
+                  selectedIndex={indices[mainView]}
+                  onSelect={(i) => selectPattern(mainView, i)}
+                />
+              </aside>
             </div>
-            <div className="min-w-0">
-              <PatternDetailPanel
-                pattern={patternDetail}
-                section={sections[mainView]}
-                onSectionChange={(sec) => setDetailSection(mainView, sec)}
-              />
-            </div>
-          </div>
-        ) : mainView === "summary" ? (
-          <SummaryView />
-        ) : (
-          <FintechView />
-        )}
+          ) : mainView === "summary" ? (
+            <SummaryView />
+          ) : (
+            <FintechView />
+          )}
+        </div>
       </div>
+      <ScrollToTopButton />
     </>
   );
 }

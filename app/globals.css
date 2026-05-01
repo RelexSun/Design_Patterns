@@ -180,3 +180,18 @@ body {
   border-radius: 9999px;
   background: var(--border-strong);
 }
+
+@keyframes float-y {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.animate-float-y {
+  animation: float-y 2.2s ease-in-out infinite;
+}

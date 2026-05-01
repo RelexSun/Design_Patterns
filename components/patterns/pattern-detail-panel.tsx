@@ -19,15 +19,25 @@ export function PatternDetailPanel({
   section,
   onSectionChange,
 }: Props) {
+  const activeSectionLabel =
+    SECTIONS.find((item) => item.id === section)?.label ?? "Overview";
+
   return (
     <article className="w-full min-w-0 max-w-full overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] shadow-sm">
       <header className="border-b border-[var(--border-subtle)] bg-[var(--surface-muted)] px-5 py-5 sm:px-7">
-        <h2 className="text-lg font-semibold tracking-tight text-[var(--text-primary)]">
-          {pattern.name}
-        </h2>
-        <p className="mt-1 text-sm text-[var(--text-secondary)]">
-          {pattern.tagline}
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight text-[var(--text-primary)]">
+              {pattern.name}
+            </h2>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+              {pattern.tagline}
+            </p>
+          </div>
+          <span className="inline-flex rounded-full border border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
+            Viewing: {activeSectionLabel}
+          </span>
+        </div>
         <div className="mt-4 flex flex-wrap gap-2">
           <MetaPill>{pattern.badge}</MetaPill>
           <MetaPill>{pattern.catalogLabel ?? "GoF Pattern"}</MetaPill>
@@ -35,7 +45,7 @@ export function PatternDetailPanel({
         </div>
       </header>
 
-      <div className="scrollbar-none flex overflow-x-auto border-b border-[var(--border-subtle)] px-3">
+      <div className="scrollbar-none flex overflow-x-auto border-b border-[var(--border-subtle)] px-3 py-2">
         {SECTIONS.map(({ id, label }) => {
           const active = section === id;
           return (
@@ -45,9 +55,9 @@ export function PatternDetailPanel({
               role="tab"
               aria-selected={active}
               onClick={() => onSectionChange(id)}
-              className={`relative shrink-0 px-4 py-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] ${
+              className={`relative shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] ${
                 active
-                  ? "text-[var(--text-primary)] after:absolute after:inset-x-4 after:bottom-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)]"
+                  ? "bg-[var(--surface-muted)] text-[var(--text-primary)]"
                   : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               }`}
             >
