@@ -2,8 +2,9 @@
 
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { FINTECH_PATTERNS, PROJECT_FILES } from "@/lib/patterns-data";
+import { FinflowServiceFeatures } from "./finflow-service-features";
 
-type FintechTab = "arch" | "schedule" | "patterns" | "most-used";
+type FintechTab = "arch" | "schedule" | "patterns" | "most-used" | "services";
 
 type ServiceCard = {
   name: string;
@@ -39,6 +40,7 @@ const TABS: { id: FintechTab; label: string }[] = [
   { id: "schedule", label: "Schedule" },
   { id: "patterns", label: "Patterns & Tech" },
   { id: "most-used", label: "Most Used Patterns" },
+  { id: "services", label: "Service features" },
 ];
 
 const CLIENT_GATEWAY: ServiceCard[] = [
@@ -457,7 +459,7 @@ export function FintechView() {
   return (
     <div className="animate-fade-in flex h-[calc(100dvh-12rem)] min-h-[34rem] flex-1 flex-col overflow-hidden">
       <section className="flex min-h-0 flex-1 flex-col gap-4">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
           {TABS.map((item) => {
             const active = tab === item.id;
             return (
@@ -674,6 +676,21 @@ export function FintechView() {
                 </article>
               ))}
             </div>
+          </div>
+        )}
+
+        {tab === "services" && (
+          <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm sm:p-5">
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                FinFlow — service feature catalog
+              </h2>
+              <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                Search and filter by layer. Expand a service to browse grouped
+                capabilities and tech stack.
+              </p>
+            </div>
+            <FinflowServiceFeatures />
           </div>
         )}
 

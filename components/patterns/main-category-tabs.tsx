@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { PATTERNS } from "@/lib/patterns-data";
 import type { MainView } from "@/lib/types";
 
@@ -38,18 +39,34 @@ const BADGE_TAILWIND: Record<string, string> = {
 type Props = {
   active: MainView;
   onChange: (view: MainView) => void;
+  /** Optional control (e.g. collapse) shown beside the title row */
+  headerRight?: ReactNode;
+  /** Omit outer card chrome when nested inside a shell (e.g. fixed sidebar) */
+  embedded?: boolean;
 };
 
-export function MainCategoryTabs({ active, onChange }: Props) {
+export function MainCategoryTabs({
+  active,
+  onChange,
+  headerRight,
+  embedded,
+}: Props) {
   return (
     <nav
-      className="rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-2 shadow-sm"
+      className={
+        embedded
+          ? "flex flex-col gap-2"
+          : "rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-2 shadow-sm"
+      }
       aria-label="Main sections"
     >
-      <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-        Main Sections
-      </p>
-      <div className="mb-2 h-px bg-[var(--border-subtle)]" />
+      <div className="flex items-center justify-between gap-2 px-2">
+        <p className="min-w-0 truncate text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+          Main Sections
+        </p>
+        {headerRight}
+      </div>
+      <div className="h-px bg-[var(--border-subtle)]" />
       <div className="space-y-1">
         {TAB_ORDER.map((id) => {
           const count = COUNTS[id];

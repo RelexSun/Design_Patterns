@@ -5,7 +5,9 @@ export default function Home() {
   return (
     <div className="flex min-h-full flex-col bg-background pt-44 sm:pt-36">
       <SiteHeader />
-      <DesignPatternsApp />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <DesignPatternsApp />
+      </div>
     </div>
   );
 }
