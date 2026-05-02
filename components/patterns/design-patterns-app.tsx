@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { PATTERNS } from "@/lib/patterns-data";
+import type { FintechTab } from "@/lib/fintech-sections";
 import type { DetailSection, MainView, PatternCategory } from "@/lib/types";
 import { MainCategoryTabs } from "./main-category-tabs";
 import { PatternCardGrid } from "./pattern-card-grid";
@@ -39,6 +40,7 @@ export function DesignPatternsApp() {
   const [indices, setIndices] = useState(initialIndices);
   const [sections, setSections] = useState(initialSections);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [fintechSection, setFintechSection] = useState<FintechTab>("arch");
 
   const selectPattern = useCallback(
     (category: PatternCategory, index: number) => {
@@ -80,6 +82,8 @@ export function DesignPatternsApp() {
               embedded
               active={mainView}
               onChange={setMainView}
+              fintechSection={fintechSection}
+              onFintechSectionChange={setFintechSection}
               headerRight={
                 <button
                   type="button"
@@ -140,7 +144,7 @@ export function DesignPatternsApp() {
           ) : mainView === "summary" ? (
             <SummaryView />
           ) : (
-            <FintechView />
+            <FintechView activeSection={fintechSection} />
           )}
         </div>
       </div>

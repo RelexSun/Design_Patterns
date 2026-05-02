@@ -1,10 +1,9 @@
 "use client";
 
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import type { FintechTab } from "@/lib/fintech-sections";
 import { FINTECH_PATTERNS, PROJECT_FILES } from "@/lib/patterns-data";
 import { FinflowServiceFeatures } from "./finflow-service-features";
-
-type FintechTab = "arch" | "schedule" | "patterns" | "most-used" | "services";
 
 type ServiceCard = {
   name: string;
@@ -34,14 +33,6 @@ type SchedulePhase = {
   level: string;
   weeks: PhaseWeek[];
 };
-
-const TABS: { id: FintechTab; label: string }[] = [
-  { id: "arch", label: "Architecture" },
-  { id: "schedule", label: "Schedule" },
-  { id: "patterns", label: "Patterns & Tech" },
-  { id: "most-used", label: "Most Used Patterns" },
-  { id: "services", label: "Service features" },
-];
 
 const CLIENT_GATEWAY: ServiceCard[] = [
   {
@@ -401,8 +392,7 @@ const SCHEDULE_WEEK_IDS = SCHEDULE.flatMap((phase) =>
   phase.weeks.map((_, weekIndex) => `${phase.id}-week-${weekIndex + 1}`),
 );
 
-export function FintechView() {
-  const [tab, setTab] = useState<FintechTab>("arch");
+export function FintechView({ activeSection }: { activeSection: FintechTab }) {
   const [activeScheduleId, setActiveScheduleId] =
     useState<string>("phase-1-week-1");
 
@@ -430,15 +420,18 @@ export function FintechView() {
   }, []);
 
   useLayoutEffect(() => {
-    if (tab !== "schedule") return;
+    if (activeSection !== "schedule") return;
 
     const root = scheduleScrollRef.current;
-    const sync = () => requestAnimationFrame(() => updateScheduleActiveFromScroll());
+    const sync = () =>
+      requestAnimationFrame(() => updateScheduleActiveFromScroll());
 
     sync();
     const idle = window.setTimeout(sync, 50);
 
-    root?.addEventListener("scroll", updateScheduleActiveFromScroll, { passive: true });
+    root?.addEventListener("scroll", updateScheduleActiveFromScroll, {
+      passive: true,
+    });
     window.addEventListener("resize", updateScheduleActiveFromScroll);
 
     return () => {
@@ -446,7 +439,7 @@ export function FintechView() {
       root?.removeEventListener("scroll", updateScheduleActiveFromScroll);
       window.removeEventListener("resize", updateScheduleActiveFromScroll);
     };
-  }, [tab, updateScheduleActiveFromScroll]);
+  }, [activeSection, updateScheduleActiveFromScroll]);
 
   const scrollToScheduleItem = (id: string) => {
     scrollSpyPauseUntilRef.current = Date.now() + 480;
@@ -458,301 +451,283 @@ export function FintechView() {
 
   return (
     <div className="animate-fade-in flex h-[calc(100dvh-12rem)] min-h-[34rem] flex-1 flex-col overflow-hidden">
-      <section className="flex min-h-0 flex-1 flex-col gap-4">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-          {TABS.map((item) => {
-            const active = tab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setTab(item.id)}
-                className={`w-full rounded-xl border px-3 py-2.5 text-sm font-medium transition ${
-                  active
-                    ? "border-[var(--border-strong)] bg-[var(--surface-muted)] text-[var(--text-primary)]"
-                    : "border-[var(--border-subtle)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                }`}
-              >
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-
+      <section className="flex min-h-0 flex-1 flex-col">
         <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-        {tab === "arch" && (
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm">
-              <div className="flex items-center gap-3 rounded-xl border border-dashed border-[var(--border-strong)] bg-[var(--surface-muted)] px-4 py-3">
-                <span className="h-3 w-3 rounded-full bg-amber-400" />
-                <p className="text-sm font-semibold text-[var(--text-primary)]">
-                  Event Bus
-                </p>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  Apache Kafka - all async communication
-                </p>
+          {activeSection === "arch" && (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm">
+                <div className="flex items-center gap-3 rounded-xl border border-dashed border-[var(--border-strong)] bg-[var(--surface-muted)] px-4 py-3">
+                  <span className="h-3 w-3 rounded-full bg-amber-400" />
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">
+                    Event Bus
+                  </p>
+                  <p className="text-sm text-[var(--text-secondary)]">
+                    Apache Kafka - all async communication
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <LayerPanel
-              title="Client & Gateway layer"
-              titleClass="text-blue-500"
-              services={CLIENT_GATEWAY}
-              columns={2}
-            />
-            <div className="grid gap-4 lg:grid-cols-2">
               <LayerPanel
-                title="Core domain services"
-                titleClass="text-emerald-500"
-                services={CORE_DOMAIN}
+                title="Client & Gateway layer"
+                titleClass="text-blue-500"
+                services={CLIENT_GATEWAY}
+                columns={2}
               />
-              <LayerPanel
-                title="Supporting services"
-                titleClass="text-violet-500"
-                services={SUPPORTING}
-              />
-            </div>
-            <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-600">
-                Infrastructure & observability
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {INFRA_ITEMS.map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full border border-[var(--border-subtle)] bg-[var(--surface-muted)] px-3 py-1.5 text-xs font-medium text-[var(--text-primary)]"
-                  >
-                    {item}
-                  </span>
-                ))}
+              <div className="grid gap-4 lg:grid-cols-2">
+                <LayerPanel
+                  title="Core domain services"
+                  titleClass="text-emerald-500"
+                  services={CORE_DOMAIN}
+                />
+                <LayerPanel
+                  title="Supporting services"
+                  titleClass="text-violet-500"
+                  services={SUPPORTING}
+                />
+              </div>
+              <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm">
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-600">
+                  Infrastructure & observability
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {INFRA_ITEMS.map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full border border-[var(--border-subtle)] bg-[var(--surface-muted)] px-3 py-1.5 text-xs font-medium text-[var(--text-primary)]"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {tab === "schedule" && (
-          <div className="w-full min-w-0 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm sm:p-5">
-            <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-              <div>
-                <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-                  FinFlow implementation schedule
-                </h2>
-                <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                  14-week path from setup and core domain to production-grade
-                  scale.
-                </p>
+            {activeSection === "schedule" && (
+            <div className="w-full min-w-0 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm sm:p-5">
+              <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                    FinFlow implementation schedule
+                  </h2>
+                  <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                    14-week path from setup and core domain to production-grade
+                    scale.
+                  </p>
+                </div>
+                <span className="rounded-full border border-[var(--border-subtle)] bg-[var(--surface-muted)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
+                  5 phases - Weeks 1-14
+                </span>
               </div>
-              <span className="rounded-full border border-[var(--border-subtle)] bg-[var(--surface-muted)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
-                5 phases - Weeks 1-14
-              </span>
-            </div>
-            <div className="grid w-full min-w-0 gap-4 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-stretch lg:min-h-[calc(100dvh-11rem)]">
-              <aside className="flex min-h-[36vh] flex-col rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-2 lg:sticky lg:top-24 lg:max-h-[calc(100dvh-11rem)] lg:min-h-0 lg:h-full">
-                <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-                  On this schedule
-                </p>
-                <div className="mb-2 h-px bg-[var(--border-subtle)]" />
-                <nav
-                  className="min-h-0 flex-1 space-y-0.5 overflow-y-auto pr-1"
-                  aria-label="Schedule sections"
+              <div className="grid w-full min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-stretch lg:min-h-[calc(100dvh-11rem)]">
+                <div
+                  ref={scheduleScrollRef}
+                  className="order-2 min-h-[48vh] w-full min-w-0 space-y-4 overflow-y-auto pr-1 lg:order-1 lg:min-h-0 lg:h-full"
                 >
                   {SCHEDULE.map((phase) => (
-                    <div key={phase.id} className="mb-1">
-                      <p className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-                        Phase {phase.number}
-                      </p>
-                      {phase.weeks.map((week, weekIndex) => {
-                        const id = `${phase.id}-week-${weekIndex + 1}`;
-                        const active = id === activeScheduleId;
-                        return (
-                          <button
-                            key={id}
-                            type="button"
-                            onClick={() => scrollToScheduleItem(id)}
-                            className={`relative w-full rounded-md px-3 py-2 text-left text-sm transition ${
-                              active
-                                ? "bg-[var(--surface-muted)] font-medium text-[var(--text-primary)]"
-                                : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
-                            }`}
-                          >
-                            {active && (
-                              <span
-                                aria-hidden
-                                className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-[var(--text-primary)]"
-                              />
-                            )}
-                            <span className="block truncate">{week.title}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <section
+                      key={phase.id}
+                      className="min-w-0 overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-muted)]"
+                    >
+                      <div className="flex items-center gap-3 px-4 py-3">
+                        <span
+                          className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${phase.numberClass}`}
+                        >
+                          {phase.number}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-semibold text-[var(--text-primary)]">
+                            {phase.name}
+                          </span>
+                          <span className="mt-0.5 block text-xs text-[var(--text-secondary)]">
+                            {phase.duration}
+                          </span>
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${phase.badgeClass}`}
+                        >
+                          {phase.level}
+                        </span>
+                      </div>
+                      <div className="border-t border-[var(--border-subtle)] bg-[var(--surface-elevated)]">
+                        {phase.weeks.map((week, weekIndex) => {
+                          const id = `${phase.id}-week-${weekIndex + 1}`;
+                          return (
+                            <article
+                              key={id}
+                              id={id}
+                              className="scroll-mt-24 border-b border-[var(--border-subtle)] px-4 py-3 last:border-b-0"
+                            >
+                              <h4 className="text-sm font-semibold text-[var(--text-primary)]">
+                                {week.title}
+                              </h4>
+                              <ul className="mt-2 min-w-0 space-y-1 text-xs leading-relaxed text-[var(--text-secondary)]">
+                                {week.tasks.map((task) => (
+                                  <li key={task} className="flex gap-2">
+                                    <span aria-hidden>-</span>
+                                    <span>{task}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                              <span className="mt-2 inline-flex rounded-md bg-[var(--surface-muted)] px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)]">
+                                ✓ {week.deliverable}
+                              </span>
+                            </article>
+                          );
+                        })}
+                      </div>
+                    </section>
                   ))}
-                </nav>
-              </aside>
+                </div>
 
-              <div
-                ref={scheduleScrollRef}
-                className="min-h-[48vh] w-full min-w-0 space-y-4 overflow-y-auto pr-1 lg:min-h-0 lg:h-full"
-              >
-                {SCHEDULE.map((phase) => (
-                  <section
-                    key={phase.id}
-                    className="min-w-0 overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-muted)]"
+                <aside className="order-1 flex min-h-[36vh] flex-col rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-2 lg:order-2 lg:sticky lg:top-24 lg:max-h-[calc(100dvh-11rem)] lg:min-h-0 lg:h-full">
+                  <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+                    On this schedule
+                  </p>
+                  <div className="mb-2 h-px bg-[var(--border-subtle)]" />
+                  <nav
+                    className="min-h-0 flex-1 space-y-0.5 overflow-y-auto pr-1"
+                    aria-label="Schedule sections"
                   >
-                    <div className="flex items-center gap-3 px-4 py-3">
-                      <span
-                        className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${phase.numberClass}`}
-                      >
-                        {phase.number}
+                    {SCHEDULE.map((phase) => (
+                      <div key={phase.id} className="mb-1">
+                        <p className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+                          Phase {phase.number}
+                        </p>
+                        {phase.weeks.map((week, weekIndex) => {
+                          const id = `${phase.id}-week-${weekIndex + 1}`;
+                          const active = id === activeScheduleId;
+                          return (
+                            <button
+                              key={id}
+                              type="button"
+                              onClick={() => scrollToScheduleItem(id)}
+                              className={`relative w-full rounded-md px-3 py-2 text-left text-sm transition ${
+                                active
+                                  ? "bg-[var(--surface-muted)] font-medium text-[var(--text-primary)]"
+                                  : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+                              }`}
+                            >
+                              {active && (
+                                <span
+                                  aria-hidden
+                                  className="absolute inset-y-1.5 right-0 w-0.5 rounded-full bg-[var(--text-primary)]"
+                                />
+                              )}
+                              <span className="block truncate">
+                                {week.title}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </nav>
+                </aside>
+              </div>
+            </div>
+          )}
+
+            {activeSection === "patterns" && (
+            <div className="space-y-4">
+              <div className="grid gap-3 md:grid-cols-2">
+                {PATTERN_TECH.map((item) => (
+                  <article
+                    key={item.title}
+                    className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm"
+                  >
+                    <h3 className="text-lg font-semibold text-[var(--text-primary)]">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+                      {item.description}
+                    </p>
+                    <p className="mt-3 text-sm text-[var(--text-secondary)]">
+                      Used in -{" "}
+                      <span className="font-medium text-[var(--text-primary)]">
+                        {item.usedIn}
                       </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-semibold text-[var(--text-primary)]">
-                          {phase.name}
-                        </span>
-                        <span className="mt-0.5 block text-xs text-[var(--text-secondary)]">
-                          {phase.duration}
-                        </span>
-                      </span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${phase.badgeClass}`}
-                      >
-                        {phase.level}
-                      </span>
-                    </div>
-                    <div className="border-t border-[var(--border-subtle)] bg-[var(--surface-elevated)]">
-                      {phase.weeks.map((week, weekIndex) => {
-                        const id = `${phase.id}-week-${weekIndex + 1}`;
-                        return (
-                          <article
-                            key={id}
-                            id={id}
-                            className="scroll-mt-24 border-b border-[var(--border-subtle)] px-4 py-3 last:border-b-0"
-                          >
-                            <h4 className="text-sm font-semibold text-[var(--text-primary)]">
-                              {week.title}
-                            </h4>
-                            <ul className="mt-2 min-w-0 space-y-1 text-xs leading-relaxed text-[var(--text-secondary)]">
-                              {week.tasks.map((task) => (
-                                <li key={task} className="flex gap-2">
-                                  <span aria-hidden>-</span>
-                                  <span>{task}</span>
-                                </li>
-                              ))}
-                            </ul>
-                            <span className="mt-2 inline-flex rounded-md bg-[var(--surface-muted)] px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)]">
-                              ✓ {week.deliverable}
-                            </span>
-                          </article>
-                        );
-                      })}
-                    </div>
-                  </section>
+                    </p>
+                  </article>
                 ))}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {tab === "patterns" && (
-          <div className="space-y-4">
-            <div className="grid gap-3 md:grid-cols-2">
-              {PATTERN_TECH.map((item) => (
-                <article
-                  key={item.title}
-                  className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm"
-                >
-                  <h3 className="text-lg font-semibold text-[var(--text-primary)]">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
-                    {item.description}
-                  </p>
-                  <p className="mt-3 text-sm text-[var(--text-secondary)]">
-                    Used in -{" "}
-                    <span className="font-medium text-[var(--text-primary)]">
-                      {item.usedIn}
-                    </span>
-                  </p>
-                </article>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {tab === "services" && (
-          <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm sm:p-5">
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-                FinFlow — service feature catalog
-              </h2>
-              <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                Search and filter by layer. Expand a service to browse grouped
-                capabilities and tech stack.
-              </p>
-            </div>
-            <FinflowServiceFeatures />
-          </div>
-        )}
-
-        {tab === "most-used" && (
-          <section className="space-y-4">
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-              Fintech/Banking — Most Used Patterns
-            </h2>
-            <p className="mt-1 text-sm text-[var(--text-secondary)]">
-              These patterns appear in virtually every enterprise banking system
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {FINTECH_PATTERNS.map((fp) => (
-                <div
-                  key={fp.name}
-                  title={fp.reason}
-                  className="flex max-w-full cursor-default items-baseline gap-1 rounded-full border border-[var(--border-strong)] bg-[var(--surface-muted)] px-3 py-2 text-xs font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface-elevated)]"
-                >
-                  <span>{fp.name}</span>
-                  <span className="truncate text-[11px] font-normal text-[var(--text-secondary)]">
-                    — {fp.reason.split(",")[0]}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <section className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm sm:p-5">
-              <div className="mb-6">
-                <h3 className="text-base font-semibold text-[var(--text-primary)]">
-                  Project: Multi-Tenant Digital Banking Platform
-                </h3>
+            {activeSection === "services" && (
+            <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm sm:p-5">
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                  FinFlow — service feature catalog
+                </h2>
                 <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                  Microservices architecture — Gateway, Account, Payment,
-                  Notification, Fraud services
+                  Search and filter by layer. Expand a service to browse grouped
+                  capabilities and tech stack.
                 </p>
               </div>
+              <FinflowServiceFeatures />
+            </div>
+          )}
 
-              <ProjectBlock
-                title="Project Structure"
-                fileLabel="tree"
-                code={PROJECT_FILES.structure}
-              />
-              <ProjectBlock
-                title="docker-compose.yml"
-                fileLabel="yml"
-                code={PROJECT_FILES.compose}
-              />
-              <ProjectBlock
-                title="Dockerfile (multi-stage)"
-                fileLabel="Dockerfile"
-                code={PROJECT_FILES.dockerfile}
-              />
-              <ProjectBlock
-                title="application.yml (account-service)"
-                fileLabel="yml"
-                code={PROJECT_FILES.appConfig}
-              />
+            {activeSection === "most-used" && (
+            <section className="space-y-4">
+              <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                Fintech/Banking — Most Used Patterns
+              </h2>
+              <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                These patterns appear in virtually every enterprise banking
+                system
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {FINTECH_PATTERNS.map((fp) => (
+                  <div
+                    key={fp.name}
+                    title={fp.reason}
+                    className="flex max-w-full cursor-default items-baseline gap-1 rounded-full border border-[var(--border-strong)] bg-[var(--surface-muted)] px-3 py-2 text-xs font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface-elevated)]"
+                  >
+                    <span>{fp.name}</span>
+                    <span className="truncate text-[11px] font-normal text-[var(--text-secondary)]">
+                      — {fp.reason.split(",")[0]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <section className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 shadow-sm sm:p-5">
+                <div className="mb-6">
+                  <h3 className="text-base font-semibold text-[var(--text-primary)]">
+                    Project: Multi-Tenant Digital Banking Platform
+                  </h3>
+                  <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                    Microservices architecture — Gateway, Account, Payment,
+                    Notification, Fraud services
+                  </p>
+                </div>
+
+                <ProjectBlock
+                  title="Project Structure"
+                  fileLabel="tree"
+                  code={PROJECT_FILES.structure}
+                />
+                <ProjectBlock
+                  title="docker-compose.yml"
+                  fileLabel="yml"
+                  code={PROJECT_FILES.compose}
+                />
+                <ProjectBlock
+                  title="Dockerfile (multi-stage)"
+                  fileLabel="Dockerfile"
+                  code={PROJECT_FILES.dockerfile}
+                />
+                <ProjectBlock
+                  title="application.yml (account-service)"
+                  fileLabel="yml"
+                  code={PROJECT_FILES.appConfig}
+                />
+              </section>
             </section>
-          </section>
-        )}
+          )}
         </div>
       </section>
-
     </div>
   );
 }
