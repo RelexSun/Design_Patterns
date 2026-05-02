@@ -14,3 +14,11 @@ export const FINTECH_SECTION_OPTIONS: { id: FintechTab; label: string }[] = [
   { id: "most-used", label: "Most Used Patterns" },
   { id: "services", label: "Service features" },
 ];
+
+const FINTECH_IDS = new Set<string>(
+  FINTECH_SECTION_OPTIONS.map((o) => o.id),
+);
+
+export function isFintechTab(value: string): value is FintechTab {
+  return FINTECH_IDS.has(value);
+}

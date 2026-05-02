@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import type { FintechTab } from "@/lib/fintech-sections";
 import { FINTECH_PATTERNS, PROJECT_FILES } from "@/lib/patterns-data";
 import { FinflowServiceFeatures } from "./finflow-service-features";
@@ -388,67 +387,7 @@ const SCHEDULE: SchedulePhase[] = [
   },
 ];
 
-const SCHEDULE_WEEK_IDS = SCHEDULE.flatMap((phase) =>
-  phase.weeks.map((_, weekIndex) => `${phase.id}-week-${weekIndex + 1}`),
-);
-
 export function FintechView({ activeSection }: { activeSection: FintechTab }) {
-  const [activeScheduleId, setActiveScheduleId] =
-    useState<string>("phase-1-week-1");
-
-  const scheduleScrollRef = useRef<HTMLDivElement>(null);
-  const scrollSpyPauseUntilRef = useRef(0);
-
-  const updateScheduleActiveFromScroll = useCallback(() => {
-    if (Date.now() < scrollSpyPauseUntilRef.current) {
-      return;
-    }
-    const root = scheduleScrollRef.current;
-    if (!root) return;
-
-    const rootRect = root.getBoundingClientRect();
-    const markerY = rootRect.top + 72;
-
-    let current = SCHEDULE_WEEK_IDS[0];
-    for (const id of SCHEDULE_WEEK_IDS) {
-      const el = document.getElementById(id);
-      if (!el) continue;
-      if (el.getBoundingClientRect().top <= markerY) current = id;
-    }
-
-    setActiveScheduleId((prev) => (prev === current ? prev : current));
-  }, []);
-
-  useLayoutEffect(() => {
-    if (activeSection !== "schedule") return;
-
-    const root = scheduleScrollRef.current;
-    const sync = () =>
-      requestAnimationFrame(() => updateScheduleActiveFromScroll());
-
-    sync();
-    const idle = window.setTimeout(sync, 50);
-
-    root?.addEventListener("scroll", updateScheduleActiveFromScroll, {
-      passive: true,
-    });
-    window.addEventListener("resize", updateScheduleActiveFromScroll);
-
-    return () => {
-      window.clearTimeout(idle);
-      root?.removeEventListener("scroll", updateScheduleActiveFromScroll);
-      window.removeEventListener("resize", updateScheduleActiveFromScroll);
-    };
-  }, [activeSection, updateScheduleActiveFromScroll]);
-
-  const scrollToScheduleItem = (id: string) => {
-    scrollSpyPauseUntilRef.current = Date.now() + 480;
-    setActiveScheduleId(id);
-    const target = document.getElementById(id);
-    if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   return (
     <div className="animate-fade-in flex h-[calc(100dvh-12rem)] min-h-[34rem] flex-1 flex-col overflow-hidden">
       <section className="flex min-h-0 flex-1 flex-col">
@@ -519,11 +458,7 @@ export function FintechView({ activeSection }: { activeSection: FintechTab }) {
                   5 phases - Weeks 1-14
                 </span>
               </div>
-              <div className="grid w-full min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-stretch lg:min-h-[calc(100dvh-11rem)]">
-                <div
-                  ref={scheduleScrollRef}
-                  className="order-2 min-h-[48vh] w-full min-w-0 space-y-4 overflow-y-auto pr-1 lg:order-1 lg:min-h-0 lg:h-full"
-                >
+              <div className="min-h-[48vh] w-full min-w-0 space-y-4">
                   {SCHEDULE.map((phase) => (
                     <section
                       key={phase.id}
@@ -578,52 +513,6 @@ export function FintechView({ activeSection }: { activeSection: FintechTab }) {
                       </div>
                     </section>
                   ))}
-                </div>
-
-                <aside className="order-1 flex min-h-[36vh] flex-col rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-2 lg:order-2 lg:sticky lg:top-24 lg:max-h-[calc(100dvh-11rem)] lg:min-h-0 lg:h-full">
-                  <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-                    On this schedule
-                  </p>
-                  <div className="mb-2 h-px bg-[var(--border-subtle)]" />
-                  <nav
-                    className="min-h-0 flex-1 space-y-0.5 overflow-y-auto pr-1"
-                    aria-label="Schedule sections"
-                  >
-                    {SCHEDULE.map((phase) => (
-                      <div key={phase.id} className="mb-1">
-                        <p className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-                          Phase {phase.number}
-                        </p>
-                        {phase.weeks.map((week, weekIndex) => {
-                          const id = `${phase.id}-week-${weekIndex + 1}`;
-                          const active = id === activeScheduleId;
-                          return (
-                            <button
-                              key={id}
-                              type="button"
-                              onClick={() => scrollToScheduleItem(id)}
-                              className={`relative w-full rounded-md px-3 py-2 text-left text-sm transition ${
-                                active
-                                  ? "bg-[var(--surface-muted)] font-medium text-[var(--text-primary)]"
-                                  : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
-                              }`}
-                            >
-                              {active && (
-                                <span
-                                  aria-hidden
-                                  className="absolute inset-y-1.5 right-0 w-0.5 rounded-full bg-[var(--text-primary)]"
-                                />
-                              )}
-                              <span className="block truncate">
-                                {week.title}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ))}
-                  </nav>
-                </aside>
               </div>
             </div>
           )}
